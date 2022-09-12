@@ -1,6 +1,6 @@
 # explorer-context-menu-command
 
-A simple **VS Code extension** [published on marketplace](https://marketplace.visualstudio.com/items?itemName=etienne-dldc.explorer-context-menu-command) that allows running commands from context menu in explorer view.
+A simple **VS Code extension** [published on marketplace](https://marketplace.visualstudio.com/items?itemName=etienne-dldc.explorer-context-menu-command) that allows running commands from context menu in explorer view, when right-clicking on a **folder** (not a file), and selecting "**Run Command**" from the pop-up menu.
 
 ## Github Repository
 The source code is available at https://github.com/etienne-dldc-graveyard/explorer-context-menu-command.
