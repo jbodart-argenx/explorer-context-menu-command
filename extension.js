@@ -43,7 +43,7 @@ function Lsaf_Local_Root(){
     return lsaf_root_path;
 }
 
-function executeCustomCommand(command, context) {
+function executeCustomFileCommand(command, context) {
     console.log("Local path: " + context.fsPath); // c:\Users\jbodart\VSXproj\OpenFolderInExplorer\img\inAction.gif
     if (command.toString().indexOf("LSAF") > -1) {
         console.log("LSAF Command: "+command);
@@ -122,6 +122,8 @@ function executeCustomCommand(command, context) {
         console.log("Executing Custom Command: extension."+command.toString());
         revealFileInOs(context)
         //return vscode.commands.executeCommand("extension."+command.toString(), context);
+        return;
+    } else if (command === undefined) {
         return;
     } else {
         console.log("Executing Built-in Command: "+command);
@@ -214,15 +216,15 @@ function activate(context) {
             vscode.window.showInformationMessage('No command found');
 
             return vscode.window.showInputBox({ prompt: 'No command found, enter command name' }).then((name) => {
-                return executeCustomCommand(name, commandContext.path);
+                return executeCustomFileCommand(name, commandContext.path);
             })
         }
         if (commands.length === 1) {
             // vscode.window.showInformationMessage('Running command ' + commands[0]);
-            return executeCustomCommand(commands[0], commandContext.path);
+            return executeCustomFileCommand(commands[0], commandContext.path);
         }
         vscode.window.showQuickPick(commands, { placeHolder: "Select a command" }).then((name) => {
-            return executeCustomCommand(name, commandContext);
+            return executeCustomFileCommand(name, commandContext);
         });
     });
 
