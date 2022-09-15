@@ -12,7 +12,9 @@
     ],
     "activationEvents": [
         "onLanguage:javascript",
-        "onCommand:extension.runCommand"
+        "onCommand:extension.runCommand",
+        "onCommand:extension.runFolderCommand",
+        "onCommand:extension.runFileCommand"
     ],
     "main": "./extension",
     "contributes": {
@@ -20,6 +22,14 @@
             {
                 "command": "extension.runCommand",
                 "title": "Run command"
+            },
+            {
+                "command": "extension.runFolderCommand",
+                "title": "Run Folder command"
+            },
+            {
+                "command": "extension.runFileCommand",
+                "title": "Run File command"
             }
         ],
         "menus": {
@@ -28,12 +38,35 @@
                     "when": "explorerResourceIsFolder",
                     "command": "extension.runCommand",
                     "group": "explorer-context-menu-command"
+                },
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.runFolderCommand",
+                    "group": "explorer-context-menu-command"
+                },{
+                    "when": "!explorerResourceIsFolder",
+                    "command": "extension.runFileCommand",
+                    "group": "explorer-context-menu-command"
                 }
             ]
         },
         "configuration": {
             "properties": {
                 "explorercontextmenu.commands": {
+                    "type": "array",
+                    "description": "List of available commands",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "explorercontextmenu.FolderCommands": {
+                    "type": "array",
+                    "description": "List of available commands",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "explorercontextmenu.FileCommands": {
                     "type": "array",
                     "description": "List of available commands",
                     "items": {
