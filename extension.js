@@ -131,6 +131,95 @@ function executeCustomFileCommand(command, context) {
     }
 }
 
+
+function executeCustomFolderCommand(command, context) {
+    console.log("Local path: " + context.fsPath); // c:\Users\jbodart\VSXproj\OpenFolderInExplorer\img\inAction.gif
+    if (command.toString().indexOf("LSAF") > -1) {
+        console.log("LSAF Command: "+command);
+        //console.log("Context: " + context);               // file:///c%3A/Users/jbodart/VSXproj/OpenFolderInExplorer/img/inAction.gif
+        //console.log("Context.path: " + context.path);     // /c:/Users/jbodart/VSXproj/OpenFolderInExplorer/img/inAction.gif
+        //console.log('Platform: '+platform);
+        if (command === "copyToLSAF"){
+            let ux_path = context.fsPath.replace(/\\/g, "/");
+            let path_elements = ux_path.split("/");
+            let fname = path_elements[path_elements.length-1];
+			//console.log("ux_path: "+ux_path);
+            //console.log("fname: "+fname);
+            let lsaf_root_path = Lsaf_Local_Root();
+            //console.log("lsaf_root_path: "+lsaf_root_path);
+            let lsafLRF_pattern = new RegExp("^"+lsaf_root_path, 'i');
+            if (lsafLRF_pattern.test(ux_path)) {
+				let lsaf_path = ux_path.replace(lsafLRF_pattern, "");
+				console.log("LSAF Path: "+ lsaf_path);	
+				console.log("\nWaiting for User comment... ");	
+                vscode.window.showInputBox({ 
+                    prompt: 'Enter version comment (this enables LSAF versioning)' ,
+                    title: "Copy to lSAF", 
+                    value: "Update "+fname
+                    }).then((comment) => {
+                        console.log("comment: "+ comment + "\n");
+                        let params = {macroVars: {local_path: context.fsPath, message: comment}}	
+                        let jsonString = JSON.stringify(params);	
+                        let src_json_file = lsaf_root_path + path.sep + ["general", "biostat", "tools", "Copy_to_lsaf.json"].join(path.sep);
+                        let sas_prog = lsaf_root_path + path.sep + ["general", "biostat", "tools", "Copy_to_lsaf.sas"].join(path.sep);
+                        let sas_log = lsaf_root_path + path.sep + ["general", "biostat", "tools", "Copy_to_lsaf.log"].join(path.sep);
+                        //console.log("sas_prog: ", sas_prog);
+                        //console.log("sas_log: ", sas_log);
+                        //console.log("src_json_file: ", src_json_file);
+                        fs.writeFileSync(src_json_file, jsonString);
+                        command = `sasjs run "${sas_prog}" --log "${sas_log}" --source "${src_json_file}"`;
+                        let curdtm = new Date();
+                        let curdtmc = curdtm.toISOString();
+                        //console.log("curdtm: ", curdtm);
+                        //console.log("curdtmc: ", curdtmc);
+                        console.log('\n['+curdtmc+'] Sending command: \n' + command + "\n...");
+                        //cp.execSync(`sasjs run "${sas_prog}" --log "${sas_log}" --source "${src_json_file}"`);
+                        cp.exec(command, 
+                                (err, stdout, stderr) => {
+                                    curdtm = new Date()
+                                    curdtmc = curdtm.toISOString();
+                                    console.log('\n['+curdtmc+'] Command results: \n');
+                                    console.log(stdout);
+                                    console.warn(stderr);
+                                    if (err) {
+                                        console.error(err);
+                                    } else {
+                                        let text = fs.readFileSync(sas_log, "utf-8");
+                                        let textByLine = text.split("\n");
+                                        let rx =  RegExp('^NOTE: SAS Life Science Analytics Framework Macro:','i');
+                                        let textFiltered = textByLine.filter(line => rx.test(line));
+                                        console.log("\n=== Excerpt of SAS Log ===\n")
+                                        if (textFiltered.length > 0) {
+                                            console.log(textFiltered.join("\n"));
+                                        } else {
+                                            console.log(textByLine.slice(Math.max(1,textByLine.length-20)).join("\n"));
+                                        }
+                                    }
+                                });
+                        }
+                    );
+			} else {
+				//console.error("Could not remove Lsaf Local Root Folder ("+lsaf_root_path+") from Unix Path: "+ux_path);
+				console.error("File Path: "+ux_path+" is not within Lsaf Local Root Folder ("+lsaf_root_path+")");
+			}
+        } else {
+            cp.execSync(`${command} "${context.fsPath}"`);
+            console.log("Done with "+command);
+        }
+        return;
+    } else if (command.toString() === "revealFileInOs") {
+        console.log("Executing Custom Command: extension."+command.toString());
+        revealFileInOs(context)
+        //return vscode.commands.executeCommand("extension."+command.toString(), context);
+        return;
+    } else if (command === undefined) {
+        return;
+    } else {
+        console.log("Executing Built-in Command: "+command);
+        return vscode.commands.executeCommand(command, context);
+    }
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -189,15 +278,15 @@ function activate(context) {
             vscode.window.showInformationMessage('No command found');
 
             return vscode.window.showInputBox({ prompt: 'No command found, enter command name' }).then((name) => {
-                return vscode.commands.executeCommand(name, commandContext);
+                return executeCustomFolderCommand(name, commandContext);
             })
         }
         if (commands.length === 1) {
             // vscode.window.showInformationMessage('Running command ' + commands[0]);
-            return vscode.commands.executeCommand(commands[0], commandContext);
+            return executeCustomFolderCommand(commands[0], commandContext);
         }
         vscode.window.showQuickPick(commands, { placeHolder: "Select a command" }).then((name) => {
-            return vscode.commands.executeCommand(name, commandContext);
+            return executeCustomFolderCommand(name, commandContext);
         });
     });
 
