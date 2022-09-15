@@ -14,9 +14,9 @@ const platform = os.platform();
 function revealFileInOs(context){
     console.log('Platform: '+platform);
 
-    const command = (platform === 'win32' && 'explorer')
-        || (platform === 'linux' && 'xdg-open')
-        || (platform === 'darwin' && 'open');
+    const command = (platform === 'win32' && 'explorer /select,')
+        || (platform === 'linux' && 'xdg-open ')
+        || (platform === 'darwin' && 'open ');
 
     if (!command) {
         vscode.window.showWarningMessage(`Your operating system (${platform}) isn't supported.`);
@@ -26,7 +26,8 @@ function revealFileInOs(context){
     console.log('Command: '+command);
     console.log("Path: "+context.fsPath);
 
-    cp.execSync(`${command} "${context.fsPath}"`);
+    //cp.execSync(`${command}"${context.fsPath}"`);
+    cp.exec(`${command}"${context.fsPath}"`);
 }
 
 
@@ -44,7 +45,7 @@ function Lsaf_Local_Root(){
 
 function executeCustomCommand(command, context) {
     console.log("Local path: " + context.fsPath); // c:\Users\jbodart\VSXproj\OpenFolderInExplorer\img\inAction.gif
-    if (command.toString().indexOf("LSAF")) {
+    if (command.toString().indexOf("LSAF") > -1) {
         console.log("LSAF Command: "+command);
         //console.log("Context: " + context);               // file:///c%3A/Users/jbodart/VSXproj/OpenFolderInExplorer/img/inAction.gif
         //console.log("Context.path: " + context.path);     // /c:/Users/jbodart/VSXproj/OpenFolderInExplorer/img/inAction.gif
@@ -116,6 +117,11 @@ function executeCustomCommand(command, context) {
             cp.execSync(`${command} "${context.fsPath}"`);
             console.log("Done with "+command);
         }
+        return;
+    } else if (command.toString() === "revealFileInOs") {
+        console.log("Executing Custom Command: extension."+command.toString());
+        revealFileInOs(context)
+        //return vscode.commands.executeCommand("extension."+command.toString(), context);
         return;
     } else {
         console.log("Executing Built-in Command: "+command);
