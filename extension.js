@@ -237,6 +237,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
+    /*
     var disposable = vscode.commands.registerCommand('extension.runCommand', function (commandContext) {
         // The code you place here will be executed every time your command is executed
         var config = vscode.workspace.getConfiguration("explorercontextmenu") || {};
@@ -264,6 +265,7 @@ function activate(context) {
     });
 
     context.subscriptions.push(disposable);
+    */
 
     var disposable2 = vscode.commands.registerCommand('extension.runFolderCommand', function (commandContext) {
         // The code you place here will be executed every time your command is executed
@@ -286,6 +288,9 @@ function activate(context) {
             return executeCustomFolderCommand(commands[0], commandContext);
         }
         vscode.window.showQuickPick(commands, { placeHolder: "Select a command" }).then((name) => {
+            if (name === undefined) {
+                return;
+            }
             return executeCustomFolderCommand(name, commandContext);
         });
     });
@@ -313,6 +318,9 @@ function activate(context) {
             return executeCustomFileCommand(commands[0], commandContext.path);
         }
         vscode.window.showQuickPick(commands, { placeHolder: "Select a command" }).then((name) => {
+            if (name === undefined) {
+                return;
+            }
             return executeCustomFileCommand(name, commandContext);
         });
     });

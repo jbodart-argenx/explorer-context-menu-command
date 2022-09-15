@@ -12,17 +12,12 @@
     ],
     "activationEvents": [
         "onLanguage:javascript",
-        "onCommand:extension.runCommand",
         "onCommand:extension.runFolderCommand",
         "onCommand:extension.runFileCommand"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
-            {
-                "command": "extension.runCommand",
-                "title": "Run command"
-            },
             {
                 "command": "extension.runFolderCommand",
                 "title": "Run Folder command"
@@ -36,11 +31,6 @@
             "explorer/context": [
                 {
                     "when": "explorerResourceIsFolder",
-                    "command": "extension.runCommand",
-                    "group": "explorer-context-menu-command"
-                },
-                {
-                    "when": "explorerResourceIsFolder",
                     "command": "extension.runFolderCommand",
                     "group": "explorer-context-menu-command"
                 },{
@@ -52,13 +42,6 @@
         },
         "configuration": {
             "properties": {
-                "explorercontextmenu.commands": {
-                    "type": "array",
-                    "description": "List of available commands",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "explorercontextmenu.FolderCommands": {
                     "type": "array",
                     "description": "List of available commands",
