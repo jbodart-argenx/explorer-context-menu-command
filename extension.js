@@ -177,7 +177,7 @@ function activate(context) {
     var disposable2 = vscode.commands.registerCommand('extension.runFolderCommand', function (commandContext) {
         // The code you place here will be executed every time your command is executed
         var config = vscode.workspace.getConfiguration("explorercontextmenu") || {};
-        var commands = config.commandsFolderCommands || [];
+        var commands = config.FolderCommands || [];
 
         console.log("commands(2): ", commands);
         console.log("commandContext(2): ", commandContext);
